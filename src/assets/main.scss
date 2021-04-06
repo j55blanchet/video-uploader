@@ -28,3 +28,11 @@ $input-border-color: transparent;
 $input-shadow: none;
 
 @import '~bulma';
+
+.vcenter-parent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }

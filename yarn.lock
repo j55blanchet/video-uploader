@@ -1248,6 +1248,11 @@
   resolved "https://registry.npm.taobao.org/@types/range-parser/download/@types/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha1-fuMwunyq+5gJC+zoal7kQRWQTCw=
 
+"@types/recordrtc@^5.6.5":
+  version "5.6.5"
+  resolved "https://registry.yarnpkg.com/@types/recordrtc/-/recordrtc-5.6.5.tgz#aa7b1ec80afefbe1f73296f36fcad0eabcd8c6f1"
+  integrity sha512-4FF77kV/VTnEM7lB018sr70IKl1e1rbRpXuv1G3t7Ty7Z5HGRDehH2xq9cxvTNn18DDSkm0D5gwU5CpfwiPuDQ==
+
 "@types/serve-static@*":
   version "1.13.9"
   resolved "https://registry.npm.taobao.org/@types/serve-static/download/@types/serve-static-1.13.9.tgz?cache=0&sync_timestamp=1613384362265&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fserve-static%2Fdownload%2F%40types%2Fserve-static-1.13.9.tgz#aacf28a85a05ee29a11fb7c3ead935ac56f33e4e"
