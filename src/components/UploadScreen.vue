@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container">
       <h1 class="title">Video Upload</h1>
-      <h2 class="subtitle">{{experimentName}}</h2>
+      <h2 class="subtitle">{{dataStore.experimentName}}</h2>
 
       <div class="field is-horizontal">
         <div class="field-label is-normal">Participant Id</div>
@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <p>{{prompt}}</p>
+      <p><strong>Instructions:</strong> {{dataStore.prompt}}</p>
 
       <div v-if="state === 'Record'">
         <WebcamBox />
@@ -112,8 +112,6 @@ export default defineComponent({
 
     return {
       state,
-      experimentName: dataStore.experimentName,
-      prompt: dataStore.prompt,
       dataStore,
       webcamStatus: webcamProvider.webcamStatus,
       isRecording: webcamProvider.isRecording,
