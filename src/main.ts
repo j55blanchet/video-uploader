@@ -9,6 +9,7 @@ import InterpretUrl from '@/services/UrlInterpreter';
 import App from './App.vue';
 import './registerServiceWorker';
 
+// https://www.npmjs.com/package/@fortawesome/vue-fontawesome
 library.add(faRecordVinyl);
 
 require('@/assets/main.scss');

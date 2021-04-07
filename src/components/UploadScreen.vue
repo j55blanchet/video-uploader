@@ -16,20 +16,41 @@
           </div>
         </div>
       </div>
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">Upload Identifier</div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <input type="text" class="input"
+                :disabled="dataStore.uploadNameWasSet"
+                v-model="dataStore.uploadName">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <p>{{prompt}}</p>
 
       <div v-if="state === 'Record'">
         <WebcamBox />
 
-        <div class="field is-grouped is-grouped-centered">
+        <div class="field is-grouped is-grouped-centered" v-show="webcamStatus === 'running'">
+          <p class="control pt-1">
+            <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
+              <FAIcon icon="record-vinyl" size="lg" pulse />
+            </span>
+          </p>
           <p class="control">
-            <button class="button is-large is-dark"
-              v-show="webcamStatus === 'running'"
+            <button class="button"
               @click="toggleRecording">
 
-              <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
-                <FAIcon icon="record-vinyl" />
+               <span v-show="isRecording">
+                Stop
               </span>
+              <span v-show="!isRecording">
+                Record
+              </span>
+
               <!-- <span v-if="!isRecording">Start Recording</span> -->
             </button>
           </p>
@@ -59,6 +80,10 @@
           </p>
         </div>
 
+        <div class="notification" v-if="uploadError">
+          {{uploadError}}
+        </div>
+
       </div>
 
     </div>
@@ -83,6 +108,7 @@ export default defineComponent({
     const lastRecordedBlob = ref(null as Blob | null);
     const recordedObjectUrl = ref('');
     const isUploading = ref(false);
+    const uploadError = ref(null as null | any);
 
     return {
       state,
@@ -94,6 +120,7 @@ export default defineComponent({
       lastRecordedBlob,
       recordedObjectUrl,
       isUploading,
+      uploadError,
     };
   },
   methods: {
@@ -109,6 +136,7 @@ export default defineComponent({
     discardRecordedVideo() {
       this.lastRecordedBlob = null;
       this.recordedObjectUrl = '';
+      this.uploadError = null;
       this.state = 'Record';
     },
     async uploadVideo() {
@@ -116,12 +144,18 @@ export default defineComponent({
       if (this.isUploading) return;
 
       this.isUploading = true;
+      this.uploadError = null;
       const blobName = `${dataStore.experimentName}-${dataStore.participantId}-${dataStore.uploadName}.webm`;
 
       try {
         await AzureUploader.upload(this.lastRecordedBlob, blobName);
       } catch (e) {
         console.error('Error uploading video', e);
+        this.uploadError = e;
+      }
+
+      if (this.uploadError === null) {
+        this.uploadError = 'Upload Successful';
       }
 
       this.isUploading = false;

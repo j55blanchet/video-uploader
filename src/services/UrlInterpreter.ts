@@ -13,4 +13,5 @@ export default function InterpretUrl(): void {
   });
 
   dataStore.participantIdWasSet = urlParams.get('participantId') !== null;
+  dataStore.uploadNameWasSet = urlParams.get('uploadName') !== null;
 }

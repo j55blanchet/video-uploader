@@ -4,6 +4,9 @@
     ></video>
     <div class="is-overlay" v-if="webcamStatus !== 'running'">
       <div class="vcenter-parent">
+        <div class="notification" v-if="this.webcamStartError !== null">
+          {{this.webcamStartError}}
+        </div>
         <button
           @click="startWebcam"
           class="button is-primary"
@@ -36,6 +39,7 @@ export default defineComponent({
     // const enableRecordButton = toRefs(props);
 
     const videoE = ref(null as null | HTMLVideoElement);
+    const webcamStartError = ref(null as null | any);
 
     onMounted(() => {
       if (!videoE.value) throw new Error('videoE is null');
@@ -50,13 +54,21 @@ export default defineComponent({
 
     return {
       videoE,
+      webcamStartError,
       webcamStatus: webcamProvider.webcamStatus,
       isRecording: webcamProvider.isRecording,
     };
   },
   methods: {
     async startWebcam() {
-      await webcamProvider.startWebcam();
+      this.webcamStartError = null;
+
+      try {
+        await webcamProvider.startWebcam();
+      } catch (e) {
+        this.webcamStartError = e;
+      }
+
       if (!this.videoE) throw new Error('videoE is null');
       await webcamProvider.connectVideoElement(this.videoE);
     },
