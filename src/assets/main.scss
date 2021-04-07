@@ -30,9 +30,26 @@ $input-shadow: none;
 @import '~bulma';
 
 .vcenter-parent {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.is-overlay.overlay-bottom {
+  top: auto;
+}
+.is-overlay.overlay-left {
+  right: auto;
+}
+.is-overlay.overlay-right {
+  left: auto;
+}
+.is-overlay.overlay-top {
+  bottom: auto;
+}
+
+.flipped {
+  transform: scaleX(-1);
+}

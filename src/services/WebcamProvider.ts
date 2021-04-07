@@ -17,6 +17,10 @@ export class WebcamProvider {
 
   private isWebcamLoading = ref(false);
 
+  public webcamError = ref(null as any);
+
+  public isRecording = ref(false);
+
   constructor() {
     this.readPermissionStatus();
   }
@@ -51,6 +55,7 @@ export class WebcamProvider {
           aspectRatio: 1.777777778,
           frameRate: 30,
         },
+        audio: true,
       };
 
       if (!navigator.mediaDevices?.getUserMedia) throw new Error("Browser doesn't support webcam");
@@ -103,13 +108,15 @@ export class WebcamProvider {
   }
 
   public async startRecording(): Promise<void> {
-    if (this.recorder.value) {
+    if (this.recorder.value || this.isRecording.value) {
       return;
     }
 
     if (!this.mediaStream.value) {
       throw new Error('Webcam must be started before recording can happen');
     }
+
+    this.isRecording.value = true;
 
     const rtc = new RecordRTC(this.mediaStream.value, {
       type: 'video',
@@ -118,13 +125,15 @@ export class WebcamProvider {
     this.recorder.value = rtc;
   }
 
-  public async stopRecording(): Promise<RecordRTC> {
+  public async stopRecording(): Promise<Blob> {
 
     return new Promise((res) => {
       if (!this.recorder.value) throw new Error("Haven't started recording");
+      this.isRecording.value = false;
       const recorder = this.recorder.value;
       this.recorder.value.stopRecording(() => {
-        res(recorder);
+        res(recorder.getBlob());
+        this.recorder.value = null;
       });
     });
   }

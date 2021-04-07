@@ -1,21 +1,132 @@
 <template>
   <section class="section">
-    <h1 class="title">Video Upload</h1>
-    <h2 class="subtitle">Language Learning Experiment</h2>
-    <p>Please record your video and upload here</p>
-    <WebcamBox />
-  </section>
+    <div class="container">
+      <h1 class="title">Video Upload</h1>
+      <h2 class="subtitle">{{experimentName}}</h2>
 
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">Participant Id</div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <input type="text" class="input"
+                :disabled="dataStore.participantIdWasSet"
+                v-model="dataStore.participantId">
+            </div>
+          </div>
+        </div>
+      </div>
+      <p>{{prompt}}</p>
+
+      <div v-if="state === 'Record'">
+        <WebcamBox />
+
+        <div class="field is-grouped is-grouped-centered">
+          <p class="control">
+            <button class="button is-large is-dark"
+              v-show="webcamStatus === 'running'"
+              @click="toggleRecording">
+
+              <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
+                <FAIcon icon="record-vinyl" />
+              </span>
+              <!-- <span v-if="!isRecording">Start Recording</span> -->
+            </button>
+          </p>
+        </div>
+      </div>
+
+      <div v-if="state === 'Review'">
+        <video class="flipped" controls :src="recordedObjectUrl"></video>
+
+        <div class="field is-grouped is-grouped-centered">
+          <p class="control">
+            <button class="button" :disabled="isUploading" @click="state = 'Record'">
+              Rerecord
+              <!-- <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
+                <FAIcon icon="record-vinyl" />
+              </span> -->
+              <!-- <span v-if="!isRecording">Start Recording</span> -->
+            </button>
+          </p>
+          <p class="control">
+            <button class="button is-primary"
+              :disabled="isUploading"
+              :class="{'is-loading': isUploading}"
+              @click="uploadVideo">
+              Upload Video
+            </button>
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import dataStore from '@/services/DataStore';
+import webcamProvider from '@/services/WebcamProvider';
+import AzureUploader from '@/services/AzureUploader';
 
 import WebcamBox from './WebcamBox.vue';
 
 export default defineComponent({
   name: 'UploadScreen',
   components: { WebcamBox },
+  setup() {
+
+    const state = ref('Record' as 'Record' | 'Review');
+
+    const lastRecordedBlob = ref(null as Blob | null);
+    const recordedObjectUrl = ref('');
+    const isUploading = ref(false);
+
+    return {
+      state,
+      experimentName: dataStore.experimentName,
+      prompt: dataStore.prompt,
+      dataStore,
+      webcamStatus: webcamProvider.webcamStatus,
+      isRecording: webcamProvider.isRecording,
+      lastRecordedBlob,
+      recordedObjectUrl,
+      isUploading,
+    };
+  },
+  methods: {
+    async toggleRecording() {
+      if (!webcamProvider.isRecording.value) {
+        webcamProvider.startRecording();
+      } else {
+        this.lastRecordedBlob = await webcamProvider.stopRecording();
+        this.recordedObjectUrl = URL.createObjectURL(this.lastRecordedBlob);
+        this.state = 'Review';
+      }
+    },
+    discardRecordedVideo() {
+      this.lastRecordedBlob = null;
+      this.recordedObjectUrl = '';
+      this.state = 'Record';
+    },
+    async uploadVideo() {
+      if (!this.lastRecordedBlob) return;
+      if (this.isUploading) return;
+
+      this.isUploading = true;
+      const blobName = `${dataStore.experimentName}-${dataStore.participantId}-${dataStore.uploadName}.webm`;
+
+      try {
+        await AzureUploader.upload(this.lastRecordedBlob, blobName);
+      } catch (e) {
+        console.error('Error uploading video', e);
+      }
+
+      this.isUploading = false;
+    },
+  },
 });
 
 </script>

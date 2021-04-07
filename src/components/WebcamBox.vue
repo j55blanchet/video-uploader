@@ -1,12 +1,12 @@
 <template>
   <div class="is-relative webcam-box">
-    <video ref="videoE"
+    <video ref="videoE" muted
     ></video>
     <div class="is-overlay" v-if="webcamStatus !== 'running'">
       <div class="vcenter-parent">
         <button
           @click="startWebcam"
-          class="button"
+          class="button is-primary"
           v-show="webcamStatus !== 'running'"
           :class="{'is-loading': webcamStatus==='loading'}">
           Start Webcam
@@ -26,7 +26,14 @@ import webcamProvider from '@/services/WebcamProvider';
 
 export default defineComponent({
   name: 'WebcamBox',
+  props: {
+    enableRecordButton: {
+      type: Boolean,
+      default: false,
+    },
+  },
   setup() {
+    // const enableRecordButton = toRefs(props);
 
     const videoE = ref(null as null | HTMLVideoElement);
 
@@ -44,6 +51,7 @@ export default defineComponent({
     return {
       videoE,
       webcamStatus: webcamProvider.webcamStatus,
+      isRecording: webcamProvider.isRecording,
     };
   },
   methods: {
@@ -63,20 +71,18 @@ export default defineComponent({
 <style lang="scss">
 
 .webcam-box {
+
+  max-width: 100%;
+  max-height: 100%;
+
   video {
-    background: rgba(128, 128, 128, 0.2);
+    background: rgba(128, 128, 128, 0.5);
     width: 1280px;
-    height: 720px;
+    // height: 720px;
     max-height: 100%;
     max-width: 100%;
 
     transform: scaleX(-1);
-  }
-
-  .loader {
-    margin: 0 auto;
-    width: 2rem;
-    height: 2rem;
   }
 }
 </style>
