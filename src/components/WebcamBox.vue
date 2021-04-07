@@ -22,7 +22,7 @@
 <script lang="ts">
 
 import {
-  defineComponent, onBeforeUnmount, onMounted, ref,
+  defineComponent, onBeforeUnmount, onMounted, ref, watch,
 } from 'vue';
 
 import webcamProvider from '@/services/WebcamProvider';
@@ -47,6 +47,11 @@ export default defineComponent({
         webcamProvider.connectVideoElement(videoE.value);
       }
     });
+    watch(webcamProvider.webcamStatus, (status) => {
+      if (status === 'running' && videoE.value) {
+        webcamProvider.connectVideoElement(videoE.value);
+      }
+    });
     onBeforeUnmount(() => {
       if (!videoE.value) throw new Error('videoE is null');
       webcamProvider.disconnectVideoElement(videoE.value);
@@ -55,6 +60,7 @@ export default defineComponent({
     return {
       videoE,
       webcamStartError,
+      webcamProvider,
       webcamStatus: webcamProvider.webcamStatus,
       isRecording: webcamProvider.isRecording,
     };

@@ -35,13 +35,15 @@
         <WebcamBox />
 
         <div class="field is-grouped is-grouped-centered" v-show="webcamStatus === 'running'">
-          <p class="control pt-1">
-            <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
-              <FAIcon icon="record-vinyl" size="lg" pulse />
+          <p class="control">
+            <span class="record-icon" :class="{'is-recording': isRecording}">
             </span>
+            <!-- <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
+              <FAIcon icon="record-vinyl" size="lg" pulse />
+            </span> -->
           </p>
           <p class="control">
-            <button class="button"
+            <button class="button animate-width"
               @click="toggleRecording">
 
                <span v-show="isRecording">
@@ -62,7 +64,7 @@
 
         <div class="field is-grouped is-grouped-centered">
           <p class="control">
-            <button class="button" :disabled="isUploading" @click="state = 'Record'">
+            <button class="button" :disabled="isUploading" @click="rerecord">
               Rerecord
               <!-- <span class="icon is-medium" :class="{'has-text-danger': isRecording}">
                 <FAIcon icon="record-vinyl" />
@@ -113,6 +115,7 @@ export default defineComponent({
     return {
       state,
       dataStore,
+      webcamProvider,
       webcamStatus: webcamProvider.webcamStatus,
       isRecording: webcamProvider.isRecording,
       lastRecordedBlob,
@@ -124,18 +127,21 @@ export default defineComponent({
   methods: {
     async toggleRecording() {
       if (!webcamProvider.isRecording.value) {
-        webcamProvider.startRecording();
+        await webcamProvider.startWebcam();
+        await webcamProvider.startRecording();
       } else {
         this.lastRecordedBlob = await webcamProvider.stopRecording();
         this.recordedObjectUrl = URL.createObjectURL(this.lastRecordedBlob);
         this.state = 'Review';
+        await webcamProvider.stopWebcam();
       }
     },
-    discardRecordedVideo() {
+    async rerecord() {
       this.lastRecordedBlob = null;
       this.recordedObjectUrl = '';
       this.uploadError = null;
       this.state = 'Record';
+      await webcamProvider.startWebcam();
     },
     async uploadVideo() {
       if (!this.lastRecordedBlob) return;
@@ -164,4 +170,27 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+
+@import "@/assets/main.scss";
+
+.animate-width {
+  transition: width 0.2s ease;
+}
+
+.record-icon {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 1rem;
+  background-color: $dark;
+  transition: background-color 0.2s ease;
+
+  &.is-recording {
+    background-color: $red;
+  }
+}
+
+.control .record-icon {
+  margin-top: 8px;
+}
 </style>

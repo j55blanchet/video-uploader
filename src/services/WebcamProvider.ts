@@ -99,7 +99,12 @@ export class WebcamProvider {
   }
 
   public async stopWebcam(): Promise<void> {
-    if (this.recorder) await this.stopRecording();
+    if (this.recorder) {
+      try {
+        await this.stopRecording();
+      // eslint-disable-next-line no-empty
+      } catch { }
+    }
 
     if (this.mediaStream.value) {
       this.mediaStream.value.getTracks().forEach((x) => x.stop());
