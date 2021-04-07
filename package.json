@@ -42,7 +42,7 @@
     "fs-extra": "^9.1.0"
   },
   "gitHooks": {
-    "pre-commit": "lint-staged"
+    "pre-commit-d12d2": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,vue,ts,tsx}": [
