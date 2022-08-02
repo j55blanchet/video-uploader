@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.4f4ede507f476e8fb3717a7cf25420ab.js"
+  "/precache-manifest.6c4525dad5bca175557dfc99ba9175f0.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "video-upload"});
